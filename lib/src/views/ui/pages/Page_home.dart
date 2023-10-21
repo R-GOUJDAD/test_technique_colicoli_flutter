@@ -11,7 +11,7 @@ class Page_home extends StatefulWidget {
 
 class _MyWidgetState extends State<Page_home> {
   List<Map<String, dynamic>> tasks = []; // Liste des tâches
-
+  int taskCount = 0;
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
@@ -19,6 +19,7 @@ class _MyWidgetState extends State<Page_home> {
     setState(() {
       // Mettez à jour votre état avec les données récupérées
       tasks = fetchedTasks;
+      taskCount = tasks.length; // Mettez à jour le nombre de tâches
     });
   }
 
@@ -29,6 +30,7 @@ class _MyWidgetState extends State<Page_home> {
     setState(() {
       // Mettez à jour votre état avec les données récupérées
       tasks = fetchedTasks;
+      taskCount = tasks.length;
     });
   }
 
@@ -39,6 +41,7 @@ class _MyWidgetState extends State<Page_home> {
     setState(() {
       // Mettez à jour votre état avec les données récupérées
       tasks = fetchedTasks;
+      taskCount = tasks.length;
     });
   }
 
@@ -55,49 +58,49 @@ class _MyWidgetState extends State<Page_home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("To-Do List"),
-      ),
-      body: Column(
-        children: <Widget>[
-          Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.all(16.0),
-            child: FloatingActionButton(
-              onPressed: () {
-                // Afficher une boîte de dialogue pour ajouter une tâche
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    String newTask = '';
-                    return AlertDialog(
-                      title: const Text('Ajouter une tâche'),
-                      content: TextField(
-                        onChanged: (value) {
-                          newTask = value;
-                        },
-                      ),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            addTask(newTask);
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('Ajouter'),
-                        ),
-                      ],
-                    );
-                  },
-                );
-              },
-              child: const Icon(Icons.add),
-            ),
+      backgroundColor: Color.fromARGB(255, 227, 226, 226),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(70.0), // Hauteur préférée de l'AppBar
+        child: Container(
+          decoration: BoxDecoration(
+            color: Color.fromARGB(
+                255, 175, 205, 232), // Couleur de fond de l'AppBar
+            borderRadius: BorderRadius.circular(
+                15.0), // Border radius pour les coins arrondis
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey.withOpacity(0.5), // Ombre
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: Offset(0, 3),
+              ),
+            ],
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: tasks.length,
-              itemBuilder: (context, index) {
-                return ListTile(
+          child: AppBar(
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text("Toutes les tâches"),
+                Text(
+                  "$taskCount tâches",
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.normal,
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: Colors.transparent,
+          ),
+        ),
+      ),
+      body: Stack(
+        children: <Widget>[
+          ListView.builder(
+            itemCount: tasks.length,
+            itemBuilder: (context, index) {
+              return Card(
+                child: ListTile(
                   title: Text(tasks[index]["Task"]),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -105,7 +108,6 @@ class _MyWidgetState extends State<Page_home> {
                       IconButton(
                         icon: const Icon(Icons.edit),
                         onPressed: () {
-                          // Afficher une boîte de dialogue pour éditer la tâche
                           showDialog(
                             context: context,
                             builder: (context) {
@@ -141,8 +143,40 @@ class _MyWidgetState extends State<Page_home> {
                       ),
                     ],
                   ),
+                ),
+              );
+            },
+          ),
+          Positioned(
+            bottom: 20,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    String newTask = '';
+                    return AlertDialog(
+                      title: const Text('Ajouter une tâche'),
+                      content: TextField(
+                        onChanged: (value) {
+                          newTask = value;
+                        },
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            addTask(newTask);
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Ajouter'),
+                        ),
+                      ],
+                    );
+                  },
                 );
               },
+              child: const Icon(Icons.add),
             ),
           ),
         ],
