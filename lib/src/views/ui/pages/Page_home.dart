@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../routes/routesTask.dart';
+
 class Page_home extends StatefulWidget {
   const Page_home({Key? key}) : super(key: key);
 
@@ -8,26 +10,45 @@ class Page_home extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<Page_home> {
-  List<String> tasks = []; // Liste des tâches
+  List<Map<String, dynamic>> tasks = []; // Liste des tâches
+
+  @override
+  void didChangeDependencies() async {
+    super.didChangeDependencies();
+    List<Map<String, dynamic>> fetchedTasks = await RoutesTask.fetchTasks();
+    setState(() {
+      // Mettez à jour votre état avec les données récupérées
+      tasks = fetchedTasks;
+    });
+  }
 
   // Méthode pour ajouter une tâche
-  void addTask(String task) {
+  void addTask(String task) async {
+    await RoutesTask.addTask(task);
+    List<Map<String, dynamic>> fetchedTasks = await RoutesTask.fetchTasks();
     setState(() {
-      tasks.add(task);
+      // Mettez à jour votre état avec les données récupérées
+      tasks = fetchedTasks;
     });
   }
 
   // Méthode pour supprimer une tâche
-  void deleteTask(int index) {
+  void deleteTask(String id) async {
+    await RoutesTask.deleteTask(id);
+    List<Map<String, dynamic>> fetchedTasks = await RoutesTask.fetchTasks();
     setState(() {
-      tasks.removeAt(index);
+      // Mettez à jour votre état avec les données récupérées
+      tasks = fetchedTasks;
     });
   }
 
   // Méthode pour éditer une tâche
-  void editTask(int index, String newTask) {
+  void editTask(String id, String newTask) async {
+    await RoutesTask.updateTask(id, newTask);
+    List<Map<String, dynamic>> fetchedTasks = await RoutesTask.fetchTasks();
     setState(() {
-      tasks[index] = newTask;
+      // Mettez à jour votre état avec les données récupérées
+      tasks = fetchedTasks;
     });
   }
 
@@ -77,7 +98,7 @@ class _MyWidgetState extends State<Page_home> {
               itemCount: tasks.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(tasks[index]),
+                  title: Text(tasks[index]["Task"]),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -88,7 +109,7 @@ class _MyWidgetState extends State<Page_home> {
                           showDialog(
                             context: context,
                             builder: (context) {
-                              String newTask = tasks[index];
+                              String newTask = tasks[index]["Task"];
                               return AlertDialog(
                                 title: const Text('Modifier la tâche'),
                                 content: TextField(
@@ -101,7 +122,7 @@ class _MyWidgetState extends State<Page_home> {
                                 actions: [
                                   TextButton(
                                     onPressed: () {
-                                      editTask(index, newTask);
+                                      editTask(tasks[index]["_id"], newTask);
                                       Navigator.of(context).pop();
                                     },
                                     child: const Text('Enregistrer'),
@@ -115,7 +136,7 @@ class _MyWidgetState extends State<Page_home> {
                       IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {
-                          deleteTask(index);
+                          deleteTask(tasks[index]["_id"]);
                         },
                       ),
                     ],

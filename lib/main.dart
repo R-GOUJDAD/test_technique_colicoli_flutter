@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test_technique_colicoli_flutter/src/views/ui/Page_home.dart';
+import 'package:test_technique_colicoli_flutter/src/views/ui/pages/Page_home.dart';
 
 void main() async {
   runApp(const MyApp());
