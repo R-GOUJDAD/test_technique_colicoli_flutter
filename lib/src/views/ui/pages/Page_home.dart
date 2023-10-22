@@ -55,6 +55,16 @@ class _MyWidgetState extends State<Page_home> {
     });
   }
 
+  void updateTaskStatus(String id, bool value) async {
+    await RoutesTask.finTask(id, value);
+    List<Map<String, dynamic>> fetchedTasks = await RoutesTask.fetchTasks();
+    setState(() {
+      // Mettez à jour votre état avec les données récupérées
+      tasks = fetchedTasks;
+      taskCount = tasks.length;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,7 +111,16 @@ class _MyWidgetState extends State<Page_home> {
             itemBuilder: (context, index) {
               return Card(
                 child: ListTile(
-                  title: Text(tasks[index]["Task"]),
+                  leading: Checkbox(
+                    // Case à cocher
+                    value: tasks[index]
+                        ["completed"], // Indiquez si la tâche est terminée
+                    onChanged: (value) {
+                      // Appeler une fonction pour mettre à jour l'état de la tâche
+                      updateTaskStatus(tasks[index]["_id"], value!);
+                    },
+                  ),
+                  title: Text(tasks[index]["Task"]), // Texte de la tâche
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

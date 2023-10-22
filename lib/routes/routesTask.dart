@@ -46,4 +46,14 @@ class RoutesTask {
       throw Exception('Échec de la mise à jour de la tâche');
     }
   }
+    static Future<void> finTask(String id, bool value) async {
+    final response = await http.patch(
+      Uri.parse('http://localhost:3000/finTask/$value/$id'),
+    );
+    if (response.statusCode == 200) {
+      // La tâche a été mise à jour avec succès
+    } else {
+      throw Exception('Échec de la mise à jour de la tâche');
+    }
+  }
 }
