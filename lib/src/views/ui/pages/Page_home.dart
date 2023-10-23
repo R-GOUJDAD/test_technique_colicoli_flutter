@@ -10,47 +10,50 @@ class Page_home extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<Page_home> {
-  List<Map<String, dynamic>> tasks = []; // Liste des tâches
+  List<Map<String, dynamic>> tasks = [];
   int taskCount = 0;
+  final searchController = TextEditingController();
+
   @override
   void didChangeDependencies() async {
     super.didChangeDependencies();
     List<Map<String, dynamic>> fetchedTasks = await RoutesTask.fetchTasks();
     setState(() {
-      // Mettez à jour votre état avec les données récupérées
       tasks = fetchedTasks;
-      taskCount = tasks.length; // Mettez à jour le nombre de tâches
+      taskCount = tasks.length;
     });
   }
 
-  // Méthode pour ajouter une tâche
+  void getAllTask() async {
+    List<Map<String, dynamic>> fetchedTasks = await RoutesTask.fetchTasks();
+    setState(() {
+      tasks = fetchedTasks;
+      taskCount = tasks.length;
+    });
+  }
+
   void addTask(String task) async {
     await RoutesTask.addTask(task);
     List<Map<String, dynamic>> fetchedTasks = await RoutesTask.fetchTasks();
     setState(() {
-      // Mettez à jour votre état avec les données récupérées
       tasks = fetchedTasks;
       taskCount = tasks.length;
     });
   }
 
-  // Méthode pour supprimer une tâche
   void deleteTask(String id) async {
     await RoutesTask.deleteTask(id);
     List<Map<String, dynamic>> fetchedTasks = await RoutesTask.fetchTasks();
     setState(() {
-      // Mettez à jour votre état avec les données récupérées
       tasks = fetchedTasks;
       taskCount = tasks.length;
     });
   }
 
-  // Méthode pour éditer une tâche
   void editTask(String id, String newTask) async {
     await RoutesTask.updateTask(id, newTask);
     List<Map<String, dynamic>> fetchedTasks = await RoutesTask.fetchTasks();
     setState(() {
-      // Mettez à jour votre état avec les données récupérées
       tasks = fetchedTasks;
     });
   }
@@ -59,9 +62,17 @@ class _MyWidgetState extends State<Page_home> {
     await RoutesTask.finTask(id, value);
     List<Map<String, dynamic>> fetchedTasks = await RoutesTask.fetchTasks();
     setState(() {
-      // Mettez à jour votre état avec les données récupérées
       tasks = fetchedTasks;
       taskCount = tasks.length;
+    });
+  }
+
+  void updateTaskList(String searchText) {
+    setState(() {
+      tasks = tasks.where((task) {
+        final taskName = task["Task"].toString().toLowerCase();
+        return taskName.contains(searchText.toLowerCase());
+      }).toList();
     });
   }
 
@@ -70,16 +81,14 @@ class _MyWidgetState extends State<Page_home> {
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 227, 226, 226),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(70.0), // Hauteur préférée de l'AppBar
+        preferredSize: Size.fromHeight(70.0),
         child: Container(
           decoration: BoxDecoration(
-            color: Color.fromARGB(
-                255, 175, 205, 232), // Couleur de fond de l'AppBar
-            borderRadius: BorderRadius.circular(
-                15.0), // Border radius pour les coins arrondis
+            color: Color.fromARGB(255, 175, 205, 232),
+            borderRadius: BorderRadius.circular(15.0),
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.5), // Ombre
+                color: Colors.grey.withOpacity(0.5),
                 spreadRadius: 5,
                 blurRadius: 7,
                 offset: Offset(0, 3),
@@ -104,98 +113,94 @@ class _MyWidgetState extends State<Page_home> {
           ),
         ),
       ),
-      body: Stack(
+      body: Column(
         children: <Widget>[
-          ListView.builder(
-            itemCount: tasks.length,
-            itemBuilder: (context, index) {
-              return Card(
-                child: ListTile(
-                  leading: Checkbox(
-                    // Case à cocher
-                    value: tasks[index]
-                        ["completed"], // Indiquez si la tâche est terminée
-                    onChanged: (value) {
-                      // Appeler une fonction pour mettre à jour l'état de la tâche
-                      updateTaskStatus(tasks[index]["_id"], value!);
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Rechercher des tâches...',
+                    ),
+                    onChanged: (text) {
+                      if (text == "") {
+                        getAllTask();
+                      }
+                      updateTaskList(text);
                     },
                   ),
-                  title: Text(tasks[index]["Task"]), // Texte de la tâche
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit),
-                        onPressed: () {
-                          showDialog(
-                            context: context,
-                            builder: (context) {
-                              String newTask = tasks[index]["Task"];
-                              return AlertDialog(
-                                title: const Text('Modifier la tâche'),
-                                content: TextField(
-                                  controller:
-                                      TextEditingController(text: newTask),
-                                  onChanged: (value) {
-                                    newTask = value;
-                                  },
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      editTask(tasks[index]["_id"], newTask);
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: const Text('Enregistrer'),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete),
-                        onPressed: () {
-                          deleteTask(tasks[index]["_id"]);
-                        },
-                      ),
-                    ],
-                  ),
                 ),
-              );
-            },
+                IconButton(
+                  icon: Icon(Icons.clear),
+                  onPressed: () {
+                    searchController.clear();
+                    updateTaskList('');
+                    getAllTask();
+                  },
+                ),
+              ],
+            ),
           ),
-          Positioned(
-            bottom: 20,
-            right: 20,
-            child: FloatingActionButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    String newTask = '';
-                    return AlertDialog(
-                      title: const Text('Ajouter une tâche'),
-                      content: TextField(
-                        onChanged: (value) {
-                          newTask = value;
-                        },
-                      ),
-                      actions: [
-                        TextButton(
+          Expanded(
+            child: ListView.builder(
+              itemCount: tasks.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  child: ListTile(
+                    leading: Checkbox(
+                      value: tasks[index]["completed"],
+                      onChanged: (value) {
+                        updateTaskStatus(tasks[index]["_id"], value!);
+                      },
+                    ),
+                    title: Text(tasks[index]["Task"]),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit),
                           onPressed: () {
-                            addTask(newTask);
-                            Navigator.of(context).pop();
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                String newTask = tasks[index]["Task"];
+                                return AlertDialog(
+                                  title: const Text('Modifier la tâche'),
+                                  content: TextField(
+                                    controller:
+                                        TextEditingController(text: newTask),
+                                    onChanged: (value) {
+                                      newTask = value;
+                                    },
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        editTask(tasks[index]["_id"], newTask);
+                                        Navigator.of(context).pop();
+                                      },
+                                      child: const Text('Enregistrer'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
                           },
-                          child: const Text('Ajouter'),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () {
+                            deleteTask(tasks[index]["_id"]);
+                          },
                         ),
                       ],
-                    );
-                  },
+                    ),
+                  ),
                 );
               },
-              child: const Icon(Icons.add),
             ),
           ),
         ],
