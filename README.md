@@ -1,16 +1,8 @@
 # test_technique_colicoli_flutter
 
-A new Flutter project.
 
-## Getting Started
+![لقطة الشاشة 2023-10-25 162301](https://github.com/R-GOUJDAD/test_technique_colicoli_flutter/assets/85451654/fceaf59e-b857-4afe-a9d5-659933310d4f)
 
-This project is a starting point for a Flutter application.
+![لقطة الشاشة 2023-10-25 175029](https://github.com/R-GOUJDAD/test_technique_colicoli_flutter/assets/85451654/66875c15-245b-444d-9542-0a55fea33dc6)
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![لقطة الشاشة 2023-10-25 175126](https://github.com/R-GOUJDAD/test_technique_colicoli_flutter/assets/85451654/892c3511-f352-44fa-a3c1-2f028cdd2c17)
